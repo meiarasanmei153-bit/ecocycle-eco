@@ -1,0 +1,57 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && getUserData().role == 'admin';
+    }
+    
+    function isRecycler() {
+      return isSignedIn() && getUserData().role == 'recycler';
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin() || isRecycler());
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow update: if isSignedIn() && (
+        (request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'phone', 'gender', 'country', 'state', 'district', 'pincode', 'address', 'landmark', 'isProfileComplete', 'avatarURL', 'phoneVerified'])) ||
+        isAdmin() ||
+        (isRecycler() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points'])) 
+      );
+    }
+
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+
+    match /requests/{requestId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() && (
+        (resource.data.userId == request.auth.uid && resource.data.status == 'pending' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['category', 'pickupDate', 'address', 'imageURL'])) ||
+        (isRecycler() && request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'pointsEarned', 'weight', 'listingDescription'])) ||
+        (resource.data.status == 'recycled' && request.resource.data.status == 'purchased' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'purchasedAt', 'deliveryDetails'])) ||
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    match /rewards/{rewardId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

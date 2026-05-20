@@ -1,0 +1,112 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information and reward points.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "recycler", "admin"] },
+        "points": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "phone": { "type": "string" },
+        "gender": { "type": "string" },
+        "country": { "type": "string" },
+        "state": { "type": "string" },
+        "district": { "type": "string" },
+        "pincode": { "type": "string" },
+        "address": { "type": "string" },
+        "landmark": { "type": "string" },
+        "avatarURL": { "type": "string" },
+        "phoneVerified": { "type": "boolean" },
+        "greenBadge": { "type": "string" },
+        "sustainabilityScore": { "type": "number" },
+        "carbonReduced": { "type": "number" },
+        "isProfileComplete": { "type": "boolean" }
+      },
+      "required": ["uid", "name", "email", "role", "points", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Rewards redeemed or purchased by users.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "rewardId": { "type": "string" },
+        "rewardTitle": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["processing", "shipped", "delivered"] },
+        "cost": { "type": "integer" },
+        "deliveryMethod": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "rewardId", "rewardTitle", "date", "status", "cost", "createdAt"]
+    },
+    "PickupRequest": {
+      "title": "Pickup Request",
+      "description": "Information about an e-waste pickup request.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhone": { "type": "string" },
+        "category": { "type": "string" },
+        "status": { "type": "string" },
+        "pickupDate": { "type": "string" },
+        "pickupTime": { "type": "string" },
+        "address": { "type": "string" },
+        "location": { "type": "object" },
+        "imageURL": { "type": "string" },
+        "quantityEstimation": { "type": "string" },
+        "aiCategory": { "type": "string" },
+        "confidence": { "type": "string" },
+        "pointsEarned": { "type": "integer" },
+        "recyclerId": { "type": "string" },
+        "recyclerName": { "type": "string" },
+        "recyclerPhone": { "type": "string" },
+        "recyclerVehicle": { "type": "string" },
+        "liveLocation": { "type": "object" },
+        "qrCode": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "estimatedValue": { "type": "number" },
+        "invoiceURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "category", "status", "pickupDate", "address", "createdAt"]
+    },
+    "Reward": {
+      "title": "Reward",
+      "description": "Available coupons or badges that users can redeem.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "cost": { "type": "integer" },
+        "provider": { "type": "string" },
+        "code": { "type": "string" }
+      },
+      "required": ["title", "cost", "provider"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Storage for user profiles."
+    },
+    "/requests/{requestId}": {
+      "schema": "PickupRequest",
+      "description": "Storage for pickup requests."
+    },
+    "/rewards/{rewardId}": {
+      "schema": "Reward",
+      "description": "Storage for available rewards."
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Storage for user reward orders."
+    }
+  }
+}

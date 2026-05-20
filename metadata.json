@@ -1,0 +1,12 @@
+{
+  "name": "EcoCycle",
+  "description": "Smart E-Waste Collection and Recycling Management System. Professional sustainability platform with real-time tracking, AI-powered waste recognition, and blockchain-verified recycling certifications.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
